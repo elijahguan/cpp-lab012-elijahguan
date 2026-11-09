@@ -19,23 +19,29 @@ std::size_t BST::size() const noexcept {
 }
 
 bool BST::contains(int value) const {
-    (void)value;
-    throw std::logic_error("Student implementation required: contains");
+    return containsRecursive(root_, value);
 }
 
 bool BST::insert(int value) {
-    (void)value;
-    throw std::logic_error("Student implementation required: insert");
+    if (contains(value)) {
+        return false;
+    }
+    root_ = insertRecursive(root_, value);
+    size_++;
+    return true;
 }
 
 bool BST::remove(int value) {
-    (void)value;
-    throw std::logic_error("Student implementation required: remove");
+    if (!contains(value)) {
+        return false;
+    }
+    root_ = removeRecursive(root_, value);
+    size_--;
+    return true;
 }
 
 bool BST::search(int value) const {
-    (void)value;
-    throw std::logic_error("Student implementation required: search");
+    return searchRecursive(root_, value);
 }
 
 int BST::min() const {
@@ -91,27 +97,75 @@ std::vector<int> BST::levelOrder() const {
 }
 
 BSTNode* BST::insertRecursive(BSTNode* node, int value) {
-    (void)node;
-    (void)value;
-    throw std::logic_error("Student implementation required: insertRecursive");
+    if (node == nullptr) {
+        return new BSTNode(value);
+    }
+    if (value < node->value) {
+        node->left = insertRecursive(node->left, value);
+    } else if (value > node->value) {
+        node->right = insertRecursive(node->right, value);
+    }
+    return node;
 }
 
 BSTNode* BST::removeRecursive(BSTNode* node, int value) {
-    (void)node;
-    (void)value;
-    throw std::logic_error("Student implementation required: removeRecursive");
+    if (node == nullptr) {
+        return nullptr;
+    }
+    if (value < node->value) {
+        node->left = removeRecursive(node->left, value);
+        return node;
+    }
+    if (value > node->value) {
+        node->right = removeRecursive(node->right, value);
+        return node;
+    }
+
+    if (node->left == nullptr && node->right == nullptr) {
+        delete node;
+        return nullptr;
+    }
+    if (node->left == nullptr) {
+        BSTNode* rightChild = node->right;
+        delete node;
+        return rightChild;
+    }
+    if (node->right == nullptr) {
+        BSTNode* leftChild = node->left;
+        delete node;
+        return leftChild;
+    }
+
+    BSTNode* successor = minNode(node->right);
+    node->value = successor->value;
+    node->right = removeRecursive(node->right, successor->value);
+    return node;
 }
 
 bool BST::containsRecursive(const BSTNode* node, int value) const {
-    (void)node;
-    (void)value;
-    throw std::logic_error("Student implementation required: containsRecursive");
+    if (node == nullptr) {
+        return false;
+    }
+    if (node->value == value) {
+        return true;
+    }
+    if (value < node->value) {
+        return containsRecursive(node->left, value);
+    }
+    return containsRecursive(node->right, value);
 }
 
 bool BST::searchRecursive(const BSTNode* node, int value) const {
-    (void)node;
-    (void)value;
-    throw std::logic_error("Student implementation required: searchRecursive");
+    if (node == nullptr) {
+        return false;
+    }
+    if (node->value == value) {
+        return true;
+    }
+    if (value < node->value) {
+        return searchRecursive(node->left, value);
+    }
+    return searchRecursive(node->right, value);
 }
 
 BSTNode* BST::minNode(BSTNode* node) const {
